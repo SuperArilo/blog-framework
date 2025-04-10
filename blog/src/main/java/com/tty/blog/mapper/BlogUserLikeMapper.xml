@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.blog.mapper.BlogUserLikeMapper">
+    <resultMap id="likeList" type="com.tty.blog.vo.BlogUserLikeVO">
+        <id property="id" column="id"/>
+        <result property="uid" column="uid"/>
+        <result property="nickName" column="nickName"/>
+        <result property="avatar" column="avatar"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+    <select id="queryLikeList" resultMap="likeList">
+        select
+        bull.id,
+        bull.uid,
+        bum.nickName,
+        bum.avatar,
+        bull.createTime
+        from blog_user_like_list as bull
+        left join blog_user_means as bum on bull.uid = bum.uid
+        where bull.targetUid = #{targetUid}
+        order by bull.createTime desc
+    </select>
+
+    <select id="accurateSearchLike" resultType="com.tty.blog.entity.BlogUserLike">
+        select * from blog_user_like_list as bull where bull.uid = #{uid} and bull.targetUid = #{targetUid}
+    </select>
+
+    <delete id="deleteSearchLike">
+        delete from blog_user_like_list where uid = #{uid} and targetUid = #{targetUid}
+    </delete>
+</mapper>

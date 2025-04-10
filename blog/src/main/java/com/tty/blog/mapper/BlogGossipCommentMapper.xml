@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.blog.mapper.BlogGossipCommentMapper">
+    <resultMap id="commentMap" type="com.tty.blog.vo.BlogCommentVO">
+        <id property="commentId" column="commentId"/>
+        <result property="instanceId" column="gossipId"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <result property="likes" column="likes"/>
+        <association property="replyUser" javaType="com.tty.blog.vo.commentReply.CommentReplyUser">
+            <id property="replyUserId" column="replyUserId"/>
+            <result property="replyNickName" column="replyNickName"/>
+            <result property="replyAvatar" column="replyAvatar"/>
+        </association>
+        <association property="byReplyUser" javaType="com.tty.blog.vo.commentReply.CommentByReplyUser">
+            <id property="byReplyUserId" column="byReplyUserId"/>
+            <result property="byReplyNickName" column="byReplyNickName"/>
+            <result property="byReplyAvatar" column="byReplyAvatar"/>
+            <result property="byReplyCommentId" column="byReplyCommentId"/>
+        </association>
+    </resultMap>
+    <select id="commentList" resultMap="commentMap">
+        select
+        bgc.commentId,
+        bgc.gossipId,
+        bgc.createTime,
+        bgc.content,
+        bgc.byReplyCommentId,
+        (select count(*) from blog_gossip_comment_like_list as bgcll where bgcll.commentId = bgc.commentId) as likes,
+        reply_user.uid as replyUserId,
+        reply_user.nickName as replyNickName,
+        reply_user.avatar as replyAvatar,
+        by_reply_user.uid as byReplyUserId,
+        by_reply_user.nickName as byReplyNickName,
+        by_reply_user.avatar as byReplyAvatar
+        from blog_gossip_comment as bgc
+        left join blog_user_means as reply_user on bgc.replyUser = reply_user.uid
+        left join blog_user_means as by_reply_user on by_reply_user.uid = bgc.byReplyUser
+        left join blog_user as reply_user_status on reply_user_status.uid = reply_user.uid
+        left join blog_user as by_reply_user_status on by_reply_user_status.uid = by_reply_user.uid
+        where bgc.gossipId = #{gossipId}
+        order by bgc.createTime desc
+    </select>
+    <select id="queryCommentByGossipIdAndCommentId" resultMap="commentMap">
+        select
+        bgc.commentId,
+        bgc.gossipId,
+        bgc.createTime,
+        bgc.content,
+        bgc.byReplyCommentId,
+        (select count(*) from blog_gossip_comment_like_list as bgcll where bgcll.commentId = bgc.commentId) as likes,
+        reply_user.uid as replyUserId,
+        reply_user.nickName as replyNickName,
+        reply_user.avatar as replyAvatar,
+        by_reply_user.uid as byReplyUserId,
+        by_reply_user.nickName as byReplyNickName,
+        by_reply_user.avatar as byReplyAvatar
+        from blog_gossip_comment as bgc
+        left join blog_user_means as reply_user on bgc.replyUser = reply_user.uid
+        left join blog_user_means as by_reply_user on by_reply_user.uid = bgc.byReplyUser
+        left join blog_user as reply_user_status on reply_user_status.uid = reply_user.uid
+        left join blog_user as by_reply_user_status on by_reply_user_status.uid = by_reply_user.uid
+        where bgc.gossipId = #{gossipId} and bgc.commentId = #{commentId}
+    </select>
+    <delete id="deleteCommentById">
+        delete blog_gossip_comment, blog_gossip_comment_like_list from blog_gossip_comment
+        left join blog_gossip_comment_like_list
+        on blog_gossip_comment.commentId = blog_gossip_comment_like_list.commentId
+        and blog_gossip_comment.replyUser = blog_gossip_comment_like_list.uid
+        and blog_gossip_comment.gossipId = #{gossipId}
+        where blog_gossip_comment.commentId = #{commentId}
+        and blog_gossip_comment.replyUser = #{uid}
+    </delete>
+</mapper>

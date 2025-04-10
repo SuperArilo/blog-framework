@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.blog.mapper.BlogNoticeMapper">
+    <resultMap id="queryNoticeList" type="com.tty.blog.vo.BlogNoticeContentVO">
+        <id property="noticeId" column="noticeId"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <result property="classType" column="classType"/>
+        <result property="classTypeName" column="classTypeName"/>
+        <result property="author" column="nickName"/>
+    </resultMap>
+    <select id="queryNoticeByUid" resultMap="queryNoticeList">
+        SELECT
+        bn.noticeId,
+        bn.title,
+        bn.content,
+        bn.createTime,
+        bn.classType,
+        bnc.classTypeName,
+        bum.nickName
+        FROM sys_notice as bn
+        left join sys_notice_class as bnc on bnc.id = bn.classType
+        left join blog_user_means as bum on bum.uid = #{uid}
+        WHERE  bn.classType = #{classType} and bn.targetUid = #{uid}
+        order by bn.createTime desc
+    </select>
+
+    <select id="queryNoticeIsHave" resultType="java.lang.Integer">
+        select count(*) from sys_notice as bn
+        where bn.noticeId in
+        <foreach collection="noticeIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="readNotice">
+        delete from sys_notice where noticeId in
+        <foreach collection="noticeIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+    <resultMap id="pushNotice" type="com.tty.blog.vo.PushNoticeVO">
+        <id column="id" property="typeId" />
+        <result column="classTypeName" property="typeName" />
+        <result column="count" property="count" />
+    </resultMap>
+
+    <select id="queryNoticeCountByUid" resultMap="pushNotice">
+        SELECT
+        bnc.id,
+        bnc.classTypeName,
+        COUNT(1) as count
+        FROM sys_notice AS bn
+        JOIN sys_notice_class AS bnc ON bnc.id = bn.classType
+        where bn.targetUid = #{uid}
+        GROUP BY bn.classType
+    </select>
+</mapper>

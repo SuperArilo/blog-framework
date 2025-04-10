@@ -1,0 +1,33 @@
+package com.tty.blog.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.tty.blog.dto.BlogModifyEmailDTO;
+import com.tty.blog.dto.BlogUserProfilesModifyDTO;
+import com.tty.blog.entity.BlogUser;
+import com.tty.common.utils.JsonResult;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+public interface BlogUserService extends IService<BlogUser> {
+    JsonResult registerUser(String email,
+                            String password,
+                            String nickName,
+                            String verifyCode,
+                            HttpServletResponse response);
+    JsonResult login(String email,
+                     String password,
+                     HttpServletRequest request);
+
+    JsonResult token(HttpServletRequest request);
+    JsonResult findPasswordVerify(String email,
+                                  String verifyCode);
+    JsonResult passwordModify(String verifyUUID,
+                              String email,
+                              String password,
+                              String passwordAgain);
+    JsonResult loginOutUser(HttpServletRequest request);
+    JsonResult userProfiles(Long viewUid, HttpServletRequest request);
+    JsonResult userProfilesModify(BlogUserProfilesModifyDTO modifyDTO,
+                                  HttpServletRequest request);
+    JsonResult userProfilesModifyEmail(BlogModifyEmailDTO emailDTO, HttpServletRequest request);
+}

@@ -1,0 +1,24 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+/blog/src/main/resources/templates/
+/starter/src/main/resources/application-dev.yaml
+/starter/src/main/resources/application-prod.yaml
+/starter/src/main/resources/*.jks
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+

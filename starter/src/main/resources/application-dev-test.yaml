@@ -1,0 +1,137 @@
+spring:
+  mail:
+    port: 465
+    host:
+    username:
+    password:
+    protocol: smtps
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    cache: true
+    prefix: classpath:/templates/
+    suffix: .html
+    enabled: false
+  data:
+    redis:
+      host: localhost
+      database: 0
+      password:
+      port: 6379
+      client-type: jedis
+      jedis:
+        pool:
+          max-active: 20
+          max-idle: 5
+          min-idle: 0
+          max-wait: 1
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/database?useUnicode=true&character_set_server=utf8mb4&serverTimezone=Asia/Shanghai
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 10
+      connection-test-query: select 1
+      max-lifetime: 65000
+      idle-timeout: 20000
+  web:
+    resources:
+      add-mappings: true
+      static-locations: classpath:/templates/
+  task:
+    execution:
+      pool:
+        core-size: 11
+        max-size: 100
+        keep-alive: 60s
+        queue-capacity: 1000
+        allow-core-thread-timeout: true
+      thread-name-prefix: 'test-'
+server:
+  http2:
+    enabled: true
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  port: 8080
+  ssl:
+    enabled: false
+  error:
+    include-exception: true
+dev:
+  enable: true
+uid:
+  timeBits: 32           # 时间位, 默认:30
+  workerBits: 4           # 机器位, 默认:16
+  seqBits: 1              # 序列号, 默认:7
+  epochStr: "2025-01-01"   # 初始时间, 默认:"2019-02-20"
+  enableFutureTime: false # 允许使用未来时间生成ID,可以使用多少未来时间由 maxBackwardSeconds 控制， 默认: false
+  maxBackwardSeconds: 1    # 系统时钟回拨和使用未来时间最长容忍时间（秒）, 默认:1
+  CachedUidGenerator:     # CachedUidGenerator相关参数
+    boostPower: 3          # RingBuffer size扩容参数, 可提高UID生成的吞吐量, 默认:3
+    paddingFactor: 50      # 指定何时向RingBuffer中填充UID, 取值为百分比(0, 100), 默认为50
+    #scheduleInterval: 60    # 默认:不配置此项, 即不使用Schedule线程定时填充buffer环. 如需使用, 请指定Schedule线程时间间隔, 单位:秒
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: AUTO
+cdn:
+  url: ''
+  path: '/'
+  bunny:
+    zone: ''
+    password: ''
+    region: SG
+file:
+  picture:
+    image-list: PNG, JPG, JPEG, BMP, GIF, SVG, WEBP
+    picture-form: 'webp'
+    no-need-to-convert: WEBP, GIF, AVIF
+mail:
+  from: ''
+  register:
+    text-html: '/mail/register.html'
+    subject: '欢迎您在我的博客注册，这是您的验证码'
+  modify-mail:
+    text-html: '/mail/ModifyEmail.html'
+    subject: '这是您新邮箱的验证链接'
+
+custom:
+  default-avatar: 'https://'
+  default-background: 'https://'
+  login-off-avatar: 'https://'
+
+logging:
+  level:
+    root: info
+    com.superarilo: DEBUG
+    sql: DEBUG
+
+jwt:
+  token:
+    secretMap:
+      system: cf47f37292d40b1f2b1ab5183c1ea0c0
+      user: 217a822135343a3fba2f395ce6cd1665
+    seconds:
+      login: 7200
+captcha:
+  base64-type: 'data:image/png;base64,'
+  width: 200
+  height: 100
+  code-count: 4
+  circle-count: 30

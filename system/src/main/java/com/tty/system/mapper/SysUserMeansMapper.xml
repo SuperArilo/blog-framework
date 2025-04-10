@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.system.mapper.SysUserMeansMapper">
+
+    <select id="dynamicMatching" resultType="map">
+        select
+        <trim suffixOverrides=",">
+            <foreach collection="listKeys" item="key" separator=",">
+                ${key}
+            </foreach>
+        </trim>
+        from blog_user_means as bum where bum.uid = #{uid}
+
+    </select>
+
+</mapper>
