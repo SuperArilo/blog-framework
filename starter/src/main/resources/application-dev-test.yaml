@@ -73,8 +73,6 @@ server:
     enabled: false
   error:
     include-exception: true
-dev:
-  enable: true
 uid:
   timeBits: 32           # 时间位, 默认:30
   workerBits: 4           # 机器位, 默认:16
@@ -119,7 +117,7 @@ custom:
 logging:
   level:
     root: info
-    com.superarilo: DEBUG
+    com.tty: DEBUG
     sql: DEBUG
 
 jwt:
