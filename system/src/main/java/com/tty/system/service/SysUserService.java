@@ -29,4 +29,7 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @return JsonResult 包含查询结果和操作状态的JSON结果对象。
      */
     JsonResult getUserList(PageUtil pageUtil);
+
+
+    void createUser(SysUserEntity entity);
 }

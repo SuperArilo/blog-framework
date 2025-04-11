@@ -2,10 +2,9 @@ package com.tty.system.controller;
 
 import com.tty.common.utils.JsonResult;
 import com.tty.common.utils.PageUtil;
+import com.tty.system.entity.SysUserEntity;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.tty.system.service.SysUserService;
 
 
@@ -36,4 +35,18 @@ public class SysUserController {
         return sysUserService.getUserList(pageUtil);
     }
 
+    @PostMapping("/create")
+    public JsonResult create(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("type") Integer type,
+            @RequestParam("email") String email) {
+        SysUserEntity entity = new SysUserEntity();
+        entity.setType(type);
+        entity.setUsername(username);
+        entity.setPassword(password);
+        entity.setEmail(email);
+        this.sysUserService.createUser(entity);
+        return JsonResult.OK("ok");
+    }
 }

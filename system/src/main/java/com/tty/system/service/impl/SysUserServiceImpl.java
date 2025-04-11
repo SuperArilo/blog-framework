@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.tty.system.entity.SysUserEntity;
 import com.tty.system.mapper.SysUserMapper;
 import com.tty.system.service.SysUserService;
+import org.springframework.util.DigestUtils;
 
 import java.util.List;
 
@@ -57,4 +58,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         return JsonResult.OK(new PageUtil(pageInfo));
     }
 
+    @Override
+    public void createUser(SysUserEntity entity) {
+        entity.setPassword(DigestUtils.md5DigestAsHex(entity.getPassword().getBytes()));
+        this.save(entity);
+    }
 }

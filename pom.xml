@@ -11,10 +11,9 @@
     </parent>
 
     <groupId>com.tty</groupId>
-    <artifactId>api-framework</artifactId>
+    <artifactId>framework</artifactId>
     <version>1.0.0</version>
-    <name>api-framework</name>
-    <description>api-framework</description>
+    <name>framework</name>
     <packaging>pom</packaging>
 
     <modules>

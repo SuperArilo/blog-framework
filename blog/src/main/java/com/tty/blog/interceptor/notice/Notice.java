@@ -27,7 +27,6 @@ public class Notice implements HandlerInterceptor {
             this.functionTool.setResponse(response, 200, -1, "token 无效");
             return false;
         }
-
         return true;
     }
 

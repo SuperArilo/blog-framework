@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/article/comment")
+@RequestMapping("/article/comment")
 public class BlogArticleCommentController {
 
     @Resource

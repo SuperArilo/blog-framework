@@ -8,17 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface SysLoginService {
 
-    /**
-     * 登录
-     * @param user 用户信息
-     * @return JsonResult
-     */
-    JsonResult login(SysUserEntity user);
+    JsonResult login(String email, String password);
 
-    /**
-     * 登出
-     * @param request 请求
-     * @return JsonResult
-     */
     JsonResult logout(HttpServletRequest request);
 }

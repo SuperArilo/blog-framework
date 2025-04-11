@@ -18,17 +18,14 @@ public class TokenLogin implements HandlerInterceptor {
     FunctionTool functionTool;
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
-
         try {
             this.jsonWebTokenUtil.verifyToken(request.getHeader("token"), JsonWebTokenTypeEnum.USER);
         } catch (Exception e) {
             this.functionTool.setResponse(response, 200, -1, "token 无效");
             return false;
         }
-
         return true;
     }
-
     @Override
     public void postHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, ModelAndView modelAndView) throws Exception {
         HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);

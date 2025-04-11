@@ -19,19 +19,9 @@
                  left join blog_user_means as bum on bv.uid = bum.uid
         order by bv.visitTime desc
     </select>
-
-    <delete id="deleteVisitorRecord">
-        delete from blog_visitor where uid = #{uid}
-    </delete>
-
-    <select id="queryVisitorByOne" resultType="com.tty.blog.entity.BlogVisitor">
-        select * from blog_visitor as bv where bv.uid = #{uid}
-    </select>
-
-    <update id="updateVisitor">
-        update blog_visitor as bv set
-        bv.visitTime = #{visitTime}
-        where bv.id = #{id}
-    </update>
-
+    <insert id="upsert">
+        INSERT INTO blog_visitor (uid, visitTime)
+        VALUES (#{instance.uid}, #{instance.visitTime})
+        ON DUPLICATE KEY UPDATE visitTime = #{instance.visitTime}
+    </insert>
 </mapper>

@@ -5,18 +5,14 @@
 
     <parent>
         <groupId>com.tty</groupId>
-        <artifactId>api-framework</artifactId>
+        <artifactId>framework</artifactId>
         <version>1.0.0</version>
     </parent>
 
     <artifactId>starter</artifactId>
     <version>1.0.0</version>
-    <name>tty.backend.starter</name>
-    <description>common</description>
+    <name>starter</name>
 
-    <properties>
-
-    </properties>
     <dependencies>
 
         <dependency>

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/gossip/comment")
+@RequestMapping("/gossip/comment")
 public class BlogGossipCommentController {
 
     @Resource

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user/like")
+@RequestMapping("/user/like")
 public class BlogUserLikeController {
     @Resource
     BlogUserLikeService blogUserLikeService;

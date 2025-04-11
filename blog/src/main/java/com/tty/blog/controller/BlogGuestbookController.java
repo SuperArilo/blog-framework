@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/guestbook")
+@RequestMapping("/guestbook")
 public class BlogGuestbookController {
     @Resource
     BlogGuestbookService blogGuestbookService;
