@@ -14,8 +14,6 @@ public class GossipConfig implements WebMvcConfigurer {
     @Resource
     private BasePathProperties basePathProperties;
 
-    private static final String GOSSIPPATH = "/api/gossip";
-    private static final String GOSSIPCOMMENTPATH = GOSSIPPATH + "/comment";
     @Bean
     public Gossip gossip() {
         return new Gossip();
