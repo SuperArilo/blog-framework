@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class TrafficStatisticsConfig implements WebMvcConfigurer {
+
     @Bean
     public TrafficStatistics trafficStatistics() {
         return new TrafficStatistics();
