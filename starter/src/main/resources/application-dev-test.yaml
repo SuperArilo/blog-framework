@@ -73,6 +73,7 @@ server:
     enabled: false
   error:
     include-exception: true
+context-path: 'api/v1'
 uid:
   timeBits: 32           # 时间位, 默认:30
   workerBits: 4           # 机器位, 默认:16
