@@ -34,6 +34,10 @@ public class IndexController implements ErrorController {
     public String notice() {
         return "index";
     }
+    @RequestMapping("/map")
+    public String map() {
+        return "index";
+    }
     @RequestMapping("/notfound")
     public String notFound(){
         return "index";
