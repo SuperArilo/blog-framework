@@ -61,7 +61,7 @@ public class ZstdCompressionFilter implements Filter {
                 out.write(compressedData);
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         } finally {
             wrapper.copyBodyToResponse();
         }
