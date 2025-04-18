@@ -1,7 +1,7 @@
 package com.tty.system.utils;
 
-import com.alibaba.fastjson2.JSON;
-import org.apache.log4j.Logger;
+import com.tty.common.enums.TypeContentEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,9 +12,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+@Slf4j
 @Component
 public class BunnyUtil {
-    private static final Logger logger = Logger.getLogger(BunnyUtil.class);
+
     @Value("${cdn.bunny.region}")
     private Region region;
     @Value("${cdn.bunny.zone}")
@@ -34,7 +35,7 @@ public class BunnyUtil {
                 httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             }
         } catch (IOException | InterruptedException e) {
-            logger.error(e, e);
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -48,22 +49,21 @@ public class BunnyUtil {
         try(HttpClient httpClient = HttpClient.newHttpClient()) {
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            logger.error(e);
+            log.error(e.getMessage());
         }
     }
 
-    public Object ListFiles(String path) {
+    public byte[] ListFiles(String path) {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(this.region.getUrl() + "/" + this.zone + "/" + path + "/"))
-            .header("accept", "application/json")
+            .uri(URI.create(this.region.getUrl() + "/" + this.zone + path))
+            .header("accept", "*/*")
             .header("AccessKey", this.accessKey)
             .method("GET", HttpRequest.BodyPublishers.noBody())
             .build();
         try(HttpClient httpClient = HttpClient.newHttpClient()) {
-            HttpResponse<String> send = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return JSON.parseArray(send.body());
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray()).body();
         } catch (Exception e) {
-            logger.error(e, e);
+            log.error(e.getMessage());
             return null;
         }
     }
