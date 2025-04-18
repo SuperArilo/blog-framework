@@ -22,6 +22,10 @@ public class IndexController implements ErrorController {
     public String guestbook(){
         return "index";
     }
+    @RequestMapping("/links")
+    public String links(){
+        return "index";
+    }
     @RequestMapping("/friends")
     public String friends() {
         return "index";
