@@ -21,8 +21,6 @@ public class ZstdCompressionFilter implements Filter {
 
     @Resource
     private CompressionUtils compressionUtils;
-    @Value("${server.compression.enabled}")
-    private Boolean enable;
     @Value("${server.compression.mime-types}")
     private String[] mimeTypes;
     @Value("${server.compression.min-response-size}")
@@ -30,10 +28,6 @@ public class ZstdCompressionFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-//        if (this.enable) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String acceptEncoding = ((HttpServletRequest) request).getHeader("Accept-Encoding");
         if(!this.hasAcceptedMimeType((HttpServletRequest) request)) {
