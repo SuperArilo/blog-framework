@@ -3,6 +3,7 @@ package com.tty.blog.service.impl;
 import com.tty.blog.mapper.MapMapper;
 import com.tty.blog.service.MapService;
 import com.tty.blog.vo.map.MapRawConfigData;
+import com.tty.common.enums.EncodeType;
 import com.tty.common.utils.CompressionUtils;
 import jakarta.annotation.Resource;
 import org.springframework.http.*;
@@ -31,7 +32,7 @@ public class MapServiceImpl implements MapService {
         MapRawConfigData configRawData = this.mapMapper.getConfigRawData(mapId, fileName);
         if (configRawData != null) {
             try {
-                return ResponseEntity.ok(this.compressionUtils.decompress(configRawData.getData(), configRawData.getKey().replace("bluemap:", "")));
+                return ResponseEntity.ok(this.compressionUtils.decompress(configRawData.getData(), EncodeType.valueOf(configRawData.getKey().replace("bluemap:", "").toUpperCase())));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -45,7 +46,7 @@ public class MapServiceImpl implements MapService {
         MapRawConfigData tilesRawData = this.mapMapper.getTilesRawData(mapId, key, x, z);
         if (tilesRawData != null) {
             try {
-                byte[] decompress = this.compressionUtils.decompress(tilesRawData.getData(), tilesRawData.getKey().replace("bluemap:", ""));
+                byte[] decompress = this.compressionUtils.decompress(tilesRawData.getData(), EncodeType.valueOf(tilesRawData.getKey().replace("bluemap:", "").toUpperCase()));
                 if (lod == 0) {
                     return new ResponseEntity<>(decompress, DAY_HEADERS, HttpStatus.OK);
                 }

@@ -1,5 +1,7 @@
 package com.tty.common.utils;
 
+import com.github.luben.zstd.ZstdOutputStream;
+import com.tty.common.enums.EncodeType;
 import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +16,15 @@ import java.util.zip.GZIPOutputStream;
 @Component
 public class CompressionUtils {
 
-    public byte[] decompress(byte[] data, String algorithm) throws IOException {
+    public byte[] decompress(byte[] data, EncodeType type) throws IOException {
 
-        if (algorithm == null) return data;
+        if (type == null) return data;
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
-        InputStream uncompressedStream = switch (algorithm) {
-            case "gzip" -> new GZIPInputStream(bis);
-            case "zstd" -> new ZstdCompressorInputStream(bis);
-            case "default" -> new DeflaterInputStream(bis);
-            case "none" -> bis;
-            default -> throw new IllegalStateException("Unexpected value: " + algorithm);
+        InputStream uncompressedStream = switch (type) {
+            case GZIP -> new GZIPInputStream(bis);
+            case ZSTD -> new ZstdCompressorInputStream(bis);
+            case DEFAULT -> new DeflaterInputStream(bis);
+            case NONE -> bis;
         };
 
         return uncompressedStream.readAllBytes();
@@ -33,6 +34,14 @@ public class CompressionUtils {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (GZIPOutputStream gzipOS = new GZIPOutputStream(bos)) {
             gzipOS.write(data);
+        }
+        return bos.toByteArray();
+    }
+
+    public byte[] toZstd(byte[] data) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (ZstdOutputStream zstdOutputStream = new ZstdOutputStream(bos)) {
+            zstdOutputStream.write(data);
         }
         return bos.toByteArray();
     }
