@@ -7,6 +7,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class ZstdCompressionFilter implements Filter {
         byte[] responseBody = wrapper.getContentAsByteArray();
 
         if (responseBody.length < this.minResponseSize || this.isAlreadyCompressed(responseBody)) {
-            chain.doFilter(request, response);
+            wrapper.copyBodyToResponse();
             return;
         }
 
@@ -51,17 +52,16 @@ public class ZstdCompressionFilter implements Filter {
             EncodeType encoding = chooseEncoding(acceptEncoding);
             byte[] compressedData = this.compressData(responseBody, encoding);
 
-            // 8. 设置响应头（注意顺序）
             httpResponse.resetBuffer();
             httpResponse.setHeader("Content-Encoding", encoding.getKey());
             httpResponse.setContentLength(compressedData.length);
 
-            // 9. 写入压缩数据
             try (OutputStream out = httpResponse.getOutputStream()) {
                 out.write(compressedData);
+                out.flush();
             }
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
+        } catch (ClientAbortException e) {
+            log.info("Client aborted connection during compression");
         } finally {
             wrapper.copyBodyToResponse();
         }
