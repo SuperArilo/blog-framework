@@ -1,8 +1,8 @@
 package com.tty.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.tty.blog.entity.BlogGossip;
-import com.tty.blog.vo.gossip.GossipVO;
+import com.tty.common.vo.gossip.GossipVO;
+import com.tty.common.entity.BlogGossip;
 import com.tty.common.utils.JsonResult;
 import com.tty.common.utils.PageUtil;
 import jakarta.servlet.http.HttpServletRequest;

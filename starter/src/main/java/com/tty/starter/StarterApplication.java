@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication(scanBasePackages = "com.tty")
 @MapperScan(basePackages = {
     "com.tty.system.mapper",
-    "com.tty.blog.mapper"
+    "com.tty.common.mapper"
 })
 public class StarterApplication {
     public static void main(String[] args) {

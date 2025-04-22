@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.tty.blog.mapper.BlogCialloMapper">
-    <select id="getLists" resultType="com.tty.blog.entity.BlogCiallo">
-        select bc.id, bc.title, bc.imageUrl, bc.audioUrl, bc.author, bc.createTime from blog_ciallo as bc
-    </select>
-</mapper>

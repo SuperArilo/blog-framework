@@ -2,17 +2,17 @@ package com.tty.common.utils;
 
 import com.github.luben.zstd.ZstdOutputStream;
 import com.tty.common.enums.EncodeType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.zip.DeflaterInputStream;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+@Slf4j
 @Component
 public class CompressionUtils {
 
@@ -30,19 +30,34 @@ public class CompressionUtils {
         return uncompressedStream.readAllBytes();
     }
 
-    public byte[] toGzip(byte[] data) throws IOException {
+    public byte[] compress(byte[] data, EncodeType type) {
+        if (type == null || data == null || data.length == 0) {
+            return data;
+        }
+
+        try {
+            return switch (type) {
+                case GZIP -> compressWithStream(data, GZIPOutputStream::new);
+                case ZSTD -> compressWithStream(data, ZstdOutputStream::new);
+                case DEFAULT -> compressWithStream(data, DeflaterOutputStream::new);
+                case NONE -> data;
+            };
+        } catch (Exception e) {
+            log.error("Compression failed for type: {}", type, e);
+            return data;
+        }
+    }
+
+    private byte[] compressWithStream(byte[] data, IOStreamFactory streamFactory) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (GZIPOutputStream gzipOS = new GZIPOutputStream(bos)) {
-            gzipOS.write(data);
+        try (OutputStream compressionStream = streamFactory.create(bos)) {
+            compressionStream.write(data);
         }
         return bos.toByteArray();
     }
 
-    public byte[] toZstd(byte[] data) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (ZstdOutputStream zstdOutputStream = new ZstdOutputStream(bos)) {
-            zstdOutputStream.write(data);
-        }
-        return bos.toByteArray();
+    @FunctionalInterface
+    private interface IOStreamFactory {
+        OutputStream create(OutputStream out) throws IOException;
     }
 }

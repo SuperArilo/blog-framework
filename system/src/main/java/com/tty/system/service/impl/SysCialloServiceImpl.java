@@ -1,12 +1,12 @@
 package com.tty.system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tty.common.entity.BlogCiallo;
 import com.tty.common.entity.TokenUser;
 import com.tty.common.enums.ImageType;
+import com.tty.common.mapper.BlogCialloMapper;
 import com.tty.common.utils.JsonResult;
 import com.tty.common.utils.JsonWebTokenUtil;
-import com.tty.system.entity.SysCiallo;
-import com.tty.system.mapper.SysCialloMapper;
 import com.tty.system.service.SysCialloService;
 import com.tty.system.service.SysManagerFileService;
 import jakarta.annotation.Resource;
@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class SysCialloServiceImpl extends ServiceImpl<SysCialloMapper, SysCiallo> implements SysCialloService {
+public class SysCialloServiceImpl extends ServiceImpl<BlogCialloMapper, BlogCiallo> implements SysCialloService {
     @Resource
     JsonWebTokenUtil jsonWebTokenUtil;
     @Resource
@@ -26,7 +26,7 @@ public class SysCialloServiceImpl extends ServiceImpl<SysCialloMapper, SysCiallo
     @Override
     public JsonResult cialloAdd(String title, MultipartFile imageFile, MultipartFile audioFile, HttpServletRequest request) {
         Long uid = this.jsonWebTokenUtil.getPayLoad(request.getHeader("token"), TokenUser.class).getId();
-        SysCiallo ciallo = new SysCiallo();
+        BlogCiallo ciallo = new BlogCiallo();
         ciallo.setTitle(title);
         String imageUrl = sysManagerFileService.uploadImageByBunny(imageFile, UUID.randomUUID().toString(), "", uid, ImageType.Normal);
         String audioUrl = sysManagerFileService.uploadFileByBunny(audioFile, UUID.randomUUID().toString(), "/audio", uid);

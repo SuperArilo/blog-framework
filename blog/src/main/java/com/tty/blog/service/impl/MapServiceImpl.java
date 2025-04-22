@@ -1,8 +1,8 @@
 package com.tty.blog.service.impl;
 
-import com.tty.blog.mapper.MapMapper;
+import com.tty.common.mapper.MapMapper;
 import com.tty.blog.service.MapService;
-import com.tty.blog.vo.map.MapRawConfigData;
+import com.tty.common.vo.map.MapRawConfigData;
 import com.tty.common.enums.EncodeType;
 import com.tty.common.utils.CompressionUtils;
 import jakarta.annotation.Resource;

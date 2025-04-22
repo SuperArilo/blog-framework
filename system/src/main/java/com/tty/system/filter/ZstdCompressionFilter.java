@@ -74,12 +74,8 @@ public class ZstdCompressionFilter implements Filter {
         return EncodeType.GZIP;
     }
 
-    private byte[] compressData(byte[] data, EncodeType encoding) throws IOException {
-        return switch (encoding) {
-            case ZSTD -> compressionUtils.toZstd(data);
-            case GZIP -> compressionUtils.toGzip(data);
-            default -> throw new IllegalArgumentException("Unsupported encoding");
-        };
+    private byte[] compressData(byte[] data, EncodeType encoding) {
+        return this.compressionUtils.compress(data, encoding);
     }
 
     private boolean isAlreadyCompressed(byte[] data) {

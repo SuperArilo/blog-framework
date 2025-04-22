@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.common.mapper.BlogArticleCommentMapper">
+    <resultMap id="commentMap" type="com.tty.common.vo.BlogCommentVO">
+        <id property="commentId" column="commentId"/>
+        <result property="instanceId" column="articleId"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <result property="likes" column="likes"/>
+        <association property="replyUser" javaType="com.tty.common.vo.commentReply.CommentReplyUser">
+            <id property="replyUserId" column="replyUserId"/>
+            <result property="replyNickName" column="replyNickName"/>
+            <result property="replyAvatar" column="replyAvatar"/>
+        </association>
+        <association property="byReplyUser" javaType="com.tty.common.vo.commentReply.CommentByReplyUser">
+            <id property="byReplyUserId" column="byReplyUserId"/>
+            <result property="byReplyNickName" column="byReplyNickName"/>
+            <result property="byReplyAvatar" column="byReplyAvatar"/>
+            <result property="byReplyCommentId" column="byReplyCommentId"/>
+        </association>
+    </resultMap>
+    <select id="getArticleCommentList" resultMap="commentMap">
+        select
+        bac.commentId,
+        bac.articleId,
+        bac.createTime,
+        bac.content,
+        bac.byReplyCommentId,
+        (select count(*) from blog_article_comment_like_list as bacll where bacll.commentId = bac.commentId) as likes,
+        reply_user.uid as replyUserId,
+        reply_user.nickName as replyNickName,
+        reply_user.avatar as replyAvatar,
+        by_reply_user.uid as byReplyUserId,
+        by_reply_user.nickName as byReplyNickName,
+        by_reply_user.avatar as byReplyAvatar
+        from blog_article_comment as bac
+        left join blog_user_means as reply_user on reply_user.uid = bac.replyUser
+        left join blog_user_means as by_reply_user on by_reply_user.uid = bac.byReplyUser
+        where bac.articleId = #{articleId}
+        ORDER BY bac.createTime DESC
+    </select>
+    <delete id="deleteArticleCommentById">
+        DELETE blog_article_comment, blog_article_comment_like_list FROM blog_article_comment LEFT JOIN blog_article_comment_like_list
+        ON blog_article_comment.commentId = blog_article_comment_like_list.commentId and blog_article_comment.replyUser = blog_article_comment_like_list.uid and blog_article_comment.articleId = #{articleId}
+        where blog_article_comment.commentId = #{commentId}
+        and blog_article_comment.replyUser = #{userId}
+    </delete>
+
+</mapper>

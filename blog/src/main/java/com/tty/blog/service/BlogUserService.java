@@ -1,9 +1,9 @@
 package com.tty.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.tty.blog.dto.BlogModifyEmailDTO;
-import com.tty.blog.dto.BlogUserProfilesModifyDTO;
-import com.tty.blog.entity.BlogUser;
+import com.tty.common.dto.BlogModifyEmailDTO;
+import com.tty.common.dto.BlogUserProfilesModifyDTO;
+import com.tty.common.entity.BlogUser;
 import com.tty.common.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

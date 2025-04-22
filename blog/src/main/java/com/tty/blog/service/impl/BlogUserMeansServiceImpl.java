@@ -1,9 +1,9 @@
 package com.tty.blog.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tty.blog.entity.BlogUserMeans;
-import com.tty.blog.mapper.BlogUserMeansMapper;
+import com.tty.common.mapper.BlogUserMeansMapper;
 import com.tty.blog.service.BlogUserMeansService;
+import com.tty.common.entity.BlogUserMeans;
 import org.springframework.stereotype.Service;
 
 @Service

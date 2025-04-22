@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.common.mapper.BlogArticleMapper">
+
+    <resultMap id="articleInstance" type="com.tty.common.vo.article.BlogArticleVO">
+        <id property="id" column="id"/>
+        <result property="publisher" column="publisher"/>
+        <result property="createTime" column="createTime"/>
+        <result property="articleTitle" column="articleTitle"/>
+        <result property="articleIntroduction" column="articleIntroduction"/>
+        <result property="articleLikes" column="articleLikes"/>
+        <result property="articleViews" column="articleViews"/>
+        <result property="comments" column="comments"/>
+        <result property="articlePicture" column="articlePicture"/>
+    </resultMap>
+    <select id="selectBlogArticleList" resultMap="articleInstance">
+        select
+        ba.id as id,
+        ba.publisher as publisher,
+        ba.createTime as createTime,
+        ba.articleTitle as articleTitle,
+        ba.articleIntroduction as articleIntroduction,
+        (select count(*) from blog_article_like_list as ball where ball.articleId = ba.id) as articleLikes,
+        ba.articleViews as articleViews,
+        ba.articlePicture as articlePicture,
+        (select count(*) from blog_article_comment as bac where bac.articleId = ba.id) as comments
+        from blog_article as ba
+        <if test="keywords == null or keywords == ''">
+            group by ba.id, ba.articleViews
+        </if>
+        order by
+        <trim prefixOverrides=",">
+            <choose>
+                <when test="keywords == null or keywords == ''">
+                    ba.id desc
+                </when>
+                <when test="keywords == 'hot'">
+                    , ba.articleViews DESC, articleLikes DESC, comments  DESC
+                </when>
+            </choose>
+        </trim>
+    </select>
+
+    <resultMap id="articleContent" type="com.tty.common.vo.article.ArticleContentVO">
+        <id property="id" column="id"/>
+        <result property="publisher" column="publisher"/>
+        <result property="createTime" column="createTime"/>
+        <result property="articleTitle" column="articleTitle"/>
+        <result property="articleContent" column="articleContent"/>
+        <result property="articlePicture" column="articlePicture"/>
+        <result property="articleLikes" column="articleLikes"/>
+        <result property="articleViews" column="articleViews"/>
+        <result property="avatar" column="avatar"/>
+        <result property="nickName" column="nickName"/>
+        <result property="hasLike" column="hasLike"/>
+    </resultMap>
+    <select id="queryArticle" resultMap="articleContent">
+        select
+        ba.id,
+        ba.publisher,
+        ba.createTime,
+        ba.articleTitle,
+        ba.articleContent,
+        ba.articlePicture,
+        (select count(*) from blog_article_like_list as ball where ball.articleId = ba.id) as articleLikes,
+        ba.articleViews,
+        bum.avatar,
+        bum.nickName
+        <if test="uid != null">
+            , (select count(*) from blog_article_like_list as ball where ball.articleId = #{articleId} and ball.uid = #{uid}) as hasLike
+        </if>
+        from blog_article as ba
+        left join blog_user_means as bum on ba.publisher = bum.uid
+        where ba.id = #{articleId}
+    </select>
+    <update id="increaseArticleView">
+        update blog_article as ba set ba.articleViews = ba.articleViews + 1 where ba.id = #{articleId}
+    </update>
+    <resultMap id="adminBlogArticle" type="com.tty.common.vo.article.BlogArticleVO">
+        <id property="id" column="id"/>
+        <result property="publisher" column="author"/>
+        <result property="createTime" column="createTime"/>
+        <result property="articleTitle" column="articleTitle"/>
+        <result property="articleIntroduction" column="articleIntroduction"/>
+        <result property="articleViews" column="articleViews"/>
+        <result property="articleLikes" column="articleLikes"/>
+        <result property="comments" column="articleCommentNum"/>
+    </resultMap>
+    <select id="aQueryBlogArticle" resultMap="adminBlogArticle">
+        select
+        ba.id,
+        bum.nickName as author,
+        ba.createTime,
+        ba.articleTitle,
+        ba.articleIntroduction,
+        ba.articleViews,
+        (select count(*) from blog_article_like_list as ball where ball.articleId = ba.id) as articleLikes,
+        (select count(*) from blog_article_comment as bac where ba.id = bac.articleId) as articleCommentNum
+        from blog_article as ba
+        left join blog_user_means as bum on ba.publisher = bum.uid
+        <where>
+            <if test="aTitle != null and aTitle != ''">
+                ba.articleTitle like concat('%', #{aTitle}, '%')
+            </if>
+            <if test="author != null and author != ''">
+                and bum.nickName like concat('%', #{author}, '%')
+            </if>
+            <if test="beforeTime != null and beforeTime != ''">
+                and ba.createTime <![CDATA[ >= ]]> CAST(CONCAT(#{beforeTime},' 00:00:00') AS datetime)
+            </if>
+            <if test="afterTime != null and afterTime != ''">
+                and ba.createTime <![CDATA[ <= ]]> CAST(CONCAT(#{afterTime},' 23:59:59') AS datetime)
+            </if>
+        </where>
+        order by ba.createTime desc
+    </select>
+</mapper>

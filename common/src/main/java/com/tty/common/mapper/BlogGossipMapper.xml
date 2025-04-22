@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tty.common.mapper.BlogGossipMapper">
+
+    <resultMap id="gossipInstance" type="com.tty.common.vo.gossip.InstanceVO">
+        <id property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <result property="author" column="author"/>
+        <result property="avatar" column="avatar"/>
+        <result property="nickName" column="nickName"/>
+        <result property="comments" column="comments"/>
+        <result property="likes" column="likes"/>
+    </resultMap>
+    <select id="gossipListGet" resultMap="gossipInstance">
+        select
+        bg.id,
+        bg.content,
+        bg.createTime,
+        bg.author,
+        bum.avatar,
+        bum.nickName,
+        (select count(*) from blog_gossip_comment as bgc where bg.id = bgc.gossipId) as comments,
+        (select count(*) from blog_gossip_like_list as bgll where bg.id = bgll.gossipId) as likes
+        from blog_gossip as bg
+        left join blog_user as bu on bu.uid = bg.author
+        left join blog_user_means as bum on bg.author = bum.uid
+        <if test="viewUid != null">
+            where bg.author = #{viewUid}
+        </if>
+        order by bg.createTime desc
+    </select>
+    <select id="queryGossipById" resultMap="gossipInstance">
+        select
+        bg.id,
+        bg.content,
+        bg.createTime,
+        bg.author,
+        bum.avatar,
+        bum.nickName,
+        (select count(*) from blog_gossip_comment as bgc where bg.id = bgc.gossipId) as comments,
+        (select count(*) from blog_gossip_like_list as bgll where bg.id = bgll.gossipId) as likes
+        from blog_gossip as bg
+        left join blog_user as bu on bu.uid = bg.author
+        left join blog_user_means as bum on bg.author = bum.uid
+        where bg.id = #{gossipId}
+    </select>
+    <delete id="deleteGossipById">
+        delete
+        blog_gossip,
+        blog_gossip_like_list,
+        blog_gossip_comment,
+        blog_gossip_comment_like_list
+        from blog_gossip
+        left join blog_gossip_like_list on blog_gossip.id = blog_gossip_like_list.gossipId
+        left join blog_gossip_comment on blog_gossip.id = blog_gossip_comment.gossipId
+        left join blog_gossip_comment_like_list ON blog_gossip_comment_like_list.commentId = blog_gossip_comment.commentId AND blog_gossip.id = blog_gossip_comment.gossipId
+        where blog_gossip.id = #{gossipId} and blog_gossip.author = #{uid}
+    </delete>
+</mapper>

@@ -1,7 +1,7 @@
 package com.tty.blog.interceptor;
 
-import com.tty.blog.entity.BlogVisitor;
-import com.tty.blog.mapper.BlogVisitorMapper;
+import com.tty.common.entity.BlogVisitor;
+import com.tty.common.mapper.BlogVisitorMapper;
 import com.tty.common.entity.TokenUser;
 import com.tty.common.enums.JsonWebTokenTypeEnum;
 import com.tty.common.utils.JsonWebTokenUtil;

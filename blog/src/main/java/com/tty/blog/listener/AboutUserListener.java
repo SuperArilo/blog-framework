@@ -2,7 +2,7 @@ package com.tty.blog.listener;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tty.blog.config.handler.BlogWebSocket;
-import com.tty.blog.dto.event.LikeToUser;
+import com.tty.common.dto.event.LikeToUser;
 import com.tty.blog.event.UserByReplyEvent;
 import com.tty.blog.event.UserLikeGossip;
 import com.tty.blog.event.UserLikeTargetUser;

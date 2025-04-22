@@ -1,7 +1,7 @@
 package com.tty.blog.controller;
 
-import com.tty.blog.dto.BlogModifyEmailDTO;
-import com.tty.blog.dto.BlogUserProfilesModifyDTO;
+import com.tty.common.dto.BlogModifyEmailDTO;
+import com.tty.common.dto.BlogUserProfilesModifyDTO;
 import com.tty.blog.service.BlogUserService;
 import com.tty.common.utils.JsonResult;
 import jakarta.annotation.Resource;

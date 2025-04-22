@@ -1,6 +1,6 @@
 package com.tty.blog.event;
 
-import com.tty.blog.dto.event.LikeToUser;
+import com.tty.common.dto.event.LikeToUser;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

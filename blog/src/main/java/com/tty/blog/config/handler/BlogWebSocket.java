@@ -1,8 +1,8 @@
 package com.tty.blog.config.handler;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.tty.blog.mapper.BlogNoticeMapper;
-import com.tty.blog.vo.PushNoticeVO;
+import com.tty.common.mapper.BlogNoticeMapper;
+import com.tty.common.vo.PushNoticeVO;
 import com.tty.common.entity.TokenUser;
 import com.tty.common.utils.JsonWebTokenUtil;
 import jakarta.annotation.Resource;
