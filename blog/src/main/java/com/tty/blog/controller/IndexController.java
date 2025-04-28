@@ -30,6 +30,8 @@ public class IndexController implements ErrorController {
     public String friends() {
         return "index";
     }
+    @RequestMapping("/ciallo")
+    public String ciallo() { return "index"; }
     @RequestMapping("/user/{uid}")
     public String userInfo(){
         return "index";
