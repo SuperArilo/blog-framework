@@ -109,6 +109,9 @@ mail:
   modify-mail:
     text-html: '/mail/ModifyEmail.html'
     subject: '这是您新邮箱的验证链接'
+  findPassword-mail:
+    text-html: '/mail/FindPassword.html'
+    subject: '这是您的密码设置链接'
 
 custom:
   default-avatar: 'https://'
