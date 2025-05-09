@@ -1,10 +1,14 @@
 package com.tty.blog.service.impl;
 
+import com.auth0.jwt.JWT;
 import com.tty.blog.enums.MailType;
 import com.tty.blog.service.SendMailService;
+import com.tty.common.enums.redis.FindPasswordKey;
 import com.tty.common.enums.redis.mail.Register;
+import com.tty.common.mapper.BlogUserMapper;
 import com.tty.common.utils.FunctionTool;
 import com.tty.common.utils.RedisUtil;
+import com.tty.common.vo.BlogUserVO;
 import jakarta.annotation.Resource;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,8 @@ public class SendMailServiceImpl implements SendMailService {
     FunctionTool functionTool;
     @Resource
     JavaMailSender javaMailSender;
+    @Resource
+    BlogUserMapper blogUserMapper;
 
     @Value("${mail.from}")
     private String from;
@@ -42,10 +45,14 @@ public class SendMailServiceImpl implements SendMailService {
     private String registerSub;
     @Value("${mail.modify-mail.subject}")
     private String modifyMailSub;
+    @Value("${mail.findPassword-mail.subject}")
+    private String findPasswordSub;
     @Value("${mail.register.text-html}")
     private String registerTextHtml;
     @Value("${mail.modify-mail.text-html}")
     private String modifyMailTextHtml;
+    @Value("${mail.findPassword-mail.text-html}")
+    private String findPasswordTextHtml;
 
     @Override
     public String sendRegisterMail(String targetMail) {
@@ -68,9 +75,8 @@ public class SendMailServiceImpl implements SendMailService {
                     code,
                     new BufferedReader(
                             new InputStreamReader(
-                                    new ClassPathResource(this.registerTextHtml).getInputStream()
-                            )
-                    ).lines().parallel().collect(Collectors.joining(System.lineSeparator()))
+                                    new ClassPathResource(this.registerTextHtml).getInputStream()))
+                            .lines().parallel().collect(Collectors.joining(System.lineSeparator()))
             ), true);
             helper.setFrom(this.from);
             helper.setTo(targetMail);
@@ -98,11 +104,76 @@ public class SendMailServiceImpl implements SendMailService {
 
     @Override
     public String sendModifyEmail(String targetMail, HttpServletRequest request) {
+        String previousToken = request.getHeader("token");
+        Long uid = JWT.decode(previousToken).getClaim("uid").asLong();
+        if (blogUserMapper.queryHaveUser(targetMail, null) != null) return "该邮箱已经被注册！";
+        if (redisUtil.get(targetMail + "_code_modify_email_sent") != null) return "已经发送邮件咯，请耐心等待一下";
+        redisUtil.delete(uid + "_code_modify_email");
+        List<Object> code = getCode();
+        StringBuilder builder =  new StringBuilder();
+        code.forEach(builder::append);
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setSentDate(new Date());
+            helper.setSubject(this.modifyMailSub);
+            helper.setText(setCode(
+                            Arrays.asList(request.getRequestURL().toString().replaceAll(request.getRequestURI(), ""),
+                                    previousToken,
+                                    builder.toString()),
+                            new BufferedReader(
+                                    new InputStreamReader(
+                                            new ClassPathResource(this.modifyMailTextHtml).getInputStream()))
+                                    .lines().parallel().collect(Collectors.joining(System.lineSeparator()))),
+                    true);
+            helper.setFrom(this.from);
+            helper.setTo(targetMail);
+            javaMailSender.send(message);
+            Map<String, Object> map = new HashMap<>();
+            map.put("code", code);
+            map.put("email", targetMail);
+            redisUtil.set(uid + "_code_modify_email", map, 3,TimeUnit.MINUTES);
+            redisUtil.set(targetMail + "_code_modify_email_sent", targetMail, 1,TimeUnit.MINUTES);
+        } catch (Exception exception) {
+            return "邮件发送异常，请联系管理员";
+        }
         return null;
     }
 
     @Override
     public String sendFindPasswordEmail(String targetEmail, HttpServletRequest request) {
+        String key = this.functionTool.buildRedisKey(true, FindPasswordKey.Main.getKey(), targetEmail);
+        String codeKey = this.functionTool.buildRedisKey(false, FindPasswordKey.Code.getKey());
+        if (redisUtil.get(key + codeKey) != null) return "已经发送过邮件了，请耐心等待一下";
+        BlogUserVO userVO = blogUserMapper.queryHaveUser(targetEmail, null);
+        List<Object> code = this.getCode();
+        if (userVO == null) {
+            redisUtil.set(key + codeKey, code, 3,TimeUnit.MINUTES);
+            return null;
+        }
+        StringBuilder builder =  new StringBuilder();
+        code.forEach(builder::append);
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setSentDate(new Date());
+            helper.setSubject(this.findPasswordSub);
+            helper.setText(setCode(
+                    List.of(request.getRequestURL().toString().replaceAll(request.getRequestURI(), ""),
+                            builder.toString(),
+                            targetEmail),
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    new ClassPathResource(this.findPasswordTextHtml).getInputStream()))
+                            .lines().parallel().collect(Collectors.joining(System.lineSeparator()))), true);
+            helper.setFrom(this.from);
+            helper.setTo(targetEmail);
+            javaMailSender.send(message);
+            redisUtil.set(key + codeKey, code, 3,TimeUnit.MINUTES);
+        } catch (Exception exception){
+            logger.error(exception, exception);
+            return "邮件发送异常，请联系管理员";
+        }
         return null;
     }
 

@@ -4,6 +4,7 @@ import com.tty.blog.service.SendMailService;
 import com.tty.common.enums.InputRegex;
 import com.tty.common.utils.JsonResult;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,5 +25,27 @@ public class SendMailController {
             return JsonResult.ERROR(0, message);
         }
         return JsonResult.OK("发送成功");
+    }
+
+    @PostMapping("/modify/email")
+    public JsonResult blogUserModifyEmail(@RequestParam(value = "email") String email,
+                                          HttpServletRequest request) {
+        if (!email.trim().matches(InputRegex.Email.getRegex())) return JsonResult.ERROR(400, "邮箱格式错误");
+        String message = sendMailService.sendModifyEmail(email, request);
+        if (message == null) return JsonResult.OK("邮件发送成功");
+        return JsonResult.ERROR(0, message);
+    }
+
+    @PostMapping("/find-password")
+    public JsonResult blogFindPassword(@RequestParam("email") String email,
+                                       HttpServletRequest request) {
+        if (email.isEmpty()) return JsonResult.ERROR(400, "邮箱为空");
+        if (!email.trim().matches(InputRegex.Email.getRegex())) return JsonResult.ERROR(400, "邮箱格式错误");
+        String message = sendMailService.sendFindPasswordEmail(email, request);
+        if (message != null) {
+            return JsonResult.ERROR(-1, message);
+        } else {
+            return JsonResult.OK("邮件发送成功");
+        }
     }
 }

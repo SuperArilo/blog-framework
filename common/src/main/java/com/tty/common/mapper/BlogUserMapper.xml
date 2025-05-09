@@ -46,4 +46,31 @@
         on bu.uid = bum.uid
         where bu.uid = #{uid}
     </select>
+    <resultMap id="rawUser" type="com.tty.common.vo.BlogUserVO">
+        <id property="uid" column="uid"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+        <result property="registerTime" column="registerTime"/>
+        <result property="category" column="category"/>
+        <result property="loginOff" column="loginOff"/>
+    </resultMap>
+    <select id="queryHaveUser" resultMap="rawUser">
+        select
+        bu.uid,
+        bu.email,
+        bu.password,
+        bu.registerTime,
+        bu.category,
+        bu.loginOff
+        from blog.blog_user as bu
+        <where>
+            <if test="uid != null">
+                bu.uid = #{uid}
+            </if>
+            <if test="email != null and email != ''">
+                and bu.email = #{email}
+            </if>
+        </where>
+
+    </select>
 </mapper>

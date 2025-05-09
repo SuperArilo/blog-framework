@@ -5,12 +5,11 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 import com.tty.common.utils.JsonResult;
-import com.tty.system.entity.SysUserEntity;
 import com.tty.system.service.SysLoginService;
 
 
 @RestController
-@RequestMapping("/sys")
+@RequestMapping("/sys/user")
 public class SysLoginController {
 
     @Resource
