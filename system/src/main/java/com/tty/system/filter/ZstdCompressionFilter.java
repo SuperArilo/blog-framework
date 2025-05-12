@@ -20,7 +20,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 @Slf4j
 @Component
-@Order(Integer.MIN_VALUE)
+@Order(2)
 public class ZstdCompressionFilter implements Filter {
 
     @Resource
