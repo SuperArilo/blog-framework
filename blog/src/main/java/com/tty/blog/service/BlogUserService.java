@@ -7,6 +7,7 @@ import com.tty.common.entity.BlogUser;
 import com.tty.common.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 
 public interface BlogUserService extends IService<BlogUser> {
     JsonResult registerUser(String email,
@@ -25,6 +26,7 @@ public interface BlogUserService extends IService<BlogUser> {
                               String email,
                               String password,
                               String passwordAgain);
+    ResponseEntity<byte[]> userAvatar(Long uid);
     JsonResult loginOutUser(HttpServletRequest request);
     JsonResult userProfiles(Long viewUid, HttpServletRequest request);
     JsonResult userProfilesModify(BlogUserProfilesModifyDTO modifyDTO,

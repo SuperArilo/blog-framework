@@ -34,9 +34,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -67,7 +72,6 @@ public class BlogUserServiceImpl extends ServiceImpl<BlogUserMapper, BlogUser> i
     ImageConvertUtil imageConvertUtil;
     @Resource
     SysManagerFileService sysManagerFileService;
-
     @Value("${custom.login-off-avatar}")
     private String loginOffAvatar;
     @Value("${custom.default-avatar}")
@@ -221,6 +225,24 @@ public class BlogUserServiceImpl extends ServiceImpl<BlogUserMapper, BlogUser> i
             return JsonResult.OK("修改成功，请重新登录");
         } else {
             return JsonResult.ERROR(404, "服务器没有查询到要被修改的用户");
+        }
+    }
+
+    @Override
+    public ResponseEntity<byte[]> userAvatar(Long uid) {
+        String avatar = this.blogUserMeansMapper.queryUserProfiles(uid).getAvatar();
+        if (avatar == null) return ResponseEntity.notFound().build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(avatar))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            byte[] body = client.send(request, HttpResponse.BodyHandlers.ofByteArray()).body();
+            if (body.length == 0) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(body);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return ResponseEntity.notFound().build();
         }
     }
 

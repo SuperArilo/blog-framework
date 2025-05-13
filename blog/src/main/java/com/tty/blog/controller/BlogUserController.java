@@ -7,6 +7,7 @@ import com.tty.common.utils.JsonResult;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,9 +26,12 @@ public class BlogUserController {
     @PostMapping("/login")
     public JsonResult blogUserLogin(@RequestParam(value = "email", required = false) String email,
                                     @RequestParam(value = "password", required = false) String password,
-                                    HttpServletRequest request){
-
+                                    HttpServletRequest request) {
         return blogUserService.login(email, password, request);
+    }
+    @GetMapping("/avatar/{uid}")
+    public ResponseEntity<byte[]> getUserAvatar(@PathVariable("uid") Long uid) {
+        return this.blogUserService.userAvatar(uid);
     }
     @PostMapping("/token")
     public JsonResult tokenLogin(HttpServletRequest request) {
