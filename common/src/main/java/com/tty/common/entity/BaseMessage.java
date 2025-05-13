@@ -11,6 +11,6 @@ import java.util.Date;
 public class BaseMessage {
     private SocketMessageType type;
     private String message;
-    @JsonFormat(timezone = "GMT+8", pattern = DateUtil.YYYY_MM_DD_PATTERN)
+    @JsonFormat(timezone = DateUtil.TIMEZONE_GMT_8, pattern = DateUtil.YYYY_MM_DD_HH_MM_SS_PATTERN)
     private Date time;
 }

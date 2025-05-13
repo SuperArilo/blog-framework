@@ -5,6 +5,9 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ToMinecraftMessage extends BaseMessage{
+public class ToWebMessage extends BaseMessage {
     private String name;
+    private String worldName;
+    private String uuid;
+    private Long uid;
 }
