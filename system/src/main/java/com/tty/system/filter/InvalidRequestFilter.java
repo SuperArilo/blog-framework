@@ -2,6 +2,7 @@ package com.tty.system.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,8 @@ import java.io.IOException;
 import java.util.Set;
 
 @Component
-@Order(1)
+@Order(2)
+@ConditionalOnProperty(name = "ssl.enabled", havingValue = "true") // 根据配置开关启用
 public class InvalidRequestFilter implements Filter {
 
     private static final Set<String> ALLOWED_METHODS = Set.of("GET", "POST", "PUT", "DELETE");

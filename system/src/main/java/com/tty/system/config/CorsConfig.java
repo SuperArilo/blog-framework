@@ -2,6 +2,7 @@ package com.tty.system.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -9,6 +10,7 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Collections;
 
 @Configuration
+@Order(1)
 public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {

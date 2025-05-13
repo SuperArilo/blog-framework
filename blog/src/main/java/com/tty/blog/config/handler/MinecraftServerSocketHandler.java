@@ -35,7 +35,7 @@ public class MinecraftServerSocketHandler implements WebSocketHandler {
         if (serverName == null) return;
         FromMinecraftMessage fromMinecraftMessage = new Gson().fromJson((String) message.getPayload(), FromMinecraftMessage.class);
         log.info("minecraft server {} send message: {}", fromMinecraftMessage.getServerName(), fromMinecraftMessage.getMessage());
-        OnlineTalkSocketHandler.sendMessage(fromMinecraftMessage);
+        OnlineTalkSocketHandler.sendFromMinecraftMessageToUser(fromMinecraftMessage);
     }
 
     @Override

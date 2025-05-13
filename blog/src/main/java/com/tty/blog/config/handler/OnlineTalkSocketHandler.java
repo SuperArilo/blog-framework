@@ -1,10 +1,8 @@
 package com.tty.blog.config.handler;
 
 import com.google.gson.Gson;
-import com.tty.common.entity.FromMinecraftMessage;
-import com.tty.common.entity.FromWebMessage;
-import com.tty.common.entity.ToMinecraftMessage;
-import com.tty.common.entity.ToWebMessage;
+import com.tty.common.entity.*;
+import com.tty.common.enums.SocketMessageType;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -45,6 +43,7 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
         toMinecraftMessage.setMessage(fromWebMessage.getMessage());
         toMinecraftMessage.setTime(new Date());
         toMinecraftMessage.setType(fromWebMessage.getType());
+        sendMessageToUser(fromWebMessage.getMessage(), session);
         MinecraftServerSocketHandler.sendMessage(toMinecraftMessage);
     }
 
@@ -83,10 +82,10 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
         return first;
     }
 
-    public static void sendMessage(FromMinecraftMessage message) {
+    public static void sendFromMinecraftMessageToUser(FromMinecraftMessage message) {
         ONLINE_TALK_SESSION_POOL.forEach((k, v) -> {
             if (!v.isOpen()) return;
-            ToWebMessage webMessage = new ToWebMessage();
+            ToWebMcMessage webMessage = new ToWebMcMessage();
             webMessage.setPlayerName(message.getPlayerName());
             webMessage.setUuid(message.getUuid());
             webMessage.setTime(message.getTime());
@@ -95,6 +94,21 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
             webMessage.setWorldName(message.getWorldName());
             try {
                 v.sendMessage(new TextMessage(new Gson().toJson(webMessage)));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+    public static void sendMessageToUser(String message, WebSocketSession session) {
+        ONLINE_TALK_SESSION_POOL.forEach((k, v) -> {
+            if (!v.isOpen() || v.equals(session)) return;
+            ToWebUserMessage toWebUserMessage = new ToWebUserMessage();
+            toWebUserMessage.setMessage(message);
+            toWebUserMessage.setType(SocketMessageType.WEB_OTHER);
+            toWebUserMessage.setTime(new Date());
+            toWebUserMessage.setPlayerName(SocketMessageType.WEB_OTHER.getType());
+            try {
+                v.sendMessage(new TextMessage(new Gson().toJson(toWebUserMessage)));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
