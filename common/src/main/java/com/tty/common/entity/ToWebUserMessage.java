@@ -6,5 +6,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ToWebUserMessage extends BaseMessage {
-    private String playerName;
+    private Long uid;
+    private String name;
 }

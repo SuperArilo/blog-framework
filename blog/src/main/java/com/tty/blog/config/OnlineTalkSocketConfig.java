@@ -1,7 +1,7 @@
 package com.tty.blog.config;
 
 import com.tty.blog.config.handler.OnlineTalkSocketHandler;
-import com.tty.blog.interceptor.OnlineTalkSocketHandshake;
+import com.tty.blog.interceptor.BlogSocketHandshake;
 import com.tty.system.config.BasePathProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,21 +18,19 @@ public class OnlineTalkSocketConfig implements WebSocketConfigurer {
 
     @Resource
     private BasePathProperties basePathProperties;
+    @Resource
+    private BlogSocketHandshake blogSocketHandshake;
 
     @Bean
     public OnlineTalkSocketHandler onlineTalkHandler() {
         return new OnlineTalkSocketHandler();
     }
 
-    @Bean
-    public OnlineTalkSocketHandshake onlineTalkHandshake() {
-        return new OnlineTalkSocketHandshake();
-    }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(this.onlineTalkHandler(), this.basePathProperties.basePath + "/ws/minecraft/online")
-                .addInterceptors(this.onlineTalkHandshake())
+                .addInterceptors(this.blogSocketHandshake)
                 .setAllowedOrigins("*");
     }
 }

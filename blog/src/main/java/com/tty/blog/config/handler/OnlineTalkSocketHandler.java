@@ -3,6 +3,8 @@ package com.tty.blog.config.handler;
 import com.google.gson.Gson;
 import com.tty.common.entity.*;
 import com.tty.common.enums.SocketMessageType;
+import com.tty.common.utils.JsonWebTokenUtil;
+import jakarta.annotation.Resource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,18 +22,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OnlineTalkSocketHandler implements WebSocketHandler {
 
     private final Gson gson = new Gson();
-    public static final ConcurrentHashMap<String, WebSocketSession> ONLINE_TALK_SESSION_POOL = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<Long, WebSocketSession> ONLINE_TALK_SESSION_POOL = new ConcurrentHashMap<>();
+    @Resource
+    private JsonWebTokenUtil jsonWebTokenUtil;
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws IOException {
-        String uidOnUri = this.getUidOnUri(session);
-        if (uidOnUri == null) return;
-        ONLINE_TALK_SESSION_POOL.put(uidOnUri, session);
-        log.info("uid: {} connected", uidOnUri);
+        TokenUser tokenUser = this.getUser(session);
+        if (tokenUser == null) return;
+        ONLINE_TALK_SESSION_POOL.put(tokenUser.getId(), session);
+        log.info("user uid: {} connected", tokenUser.getId());
     }
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
+        TokenUser user = this.getUser(session);
+        if (user == null) return;
         FromWebMessage fromWebMessage;
         try {
             fromWebMessage = this.gson.fromJson((String) message.getPayload(), FromWebMessage.class);
@@ -43,23 +49,24 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
         toMinecraftMessage.setMessage(fromWebMessage.getMessage());
         toMinecraftMessage.setTime(new Date());
         toMinecraftMessage.setType(fromWebMessage.getType());
-        sendMessageToUser(fromWebMessage.getMessage(), session);
+        sendMessageToUser(fromWebMessage.getMessage(), session, user);
         MinecraftServerSocketHandler.sendMessage(toMinecraftMessage);
     }
 
     @Override
     public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws IOException {
         log.error("transport error", exception);
-        String uidOnUri = this.getUidOnUri(session);
-        if (uidOnUri == null) return;
-        ONLINE_TALK_SESSION_POOL.remove(uidOnUri);
+        TokenUser user = this.getUser(session);
+        if (user == null) return;
+        ONLINE_TALK_SESSION_POOL.remove(user.getId());
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) throws IOException {
-        String uidOnUri = this.getUidOnUri(session);
-        if (uidOnUri == null) return;
-        ONLINE_TALK_SESSION_POOL.remove(uidOnUri);
+        TokenUser user = this.getUser(session);
+        if (user == null) return;
+        ONLINE_TALK_SESSION_POOL.remove(user.getId());
+        log.info("uid: {} closed", user.getId());
     }
 
     @Override
@@ -67,26 +74,26 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
         return false;
     }
 
-    private String getUidOnUri(WebSocketSession session) throws IOException {
+    private TokenUser getUser(WebSocketSession session) throws IOException {
         URI uri = session.getUri();
         if (uri == null) {
             session.close(CloseStatus.POLICY_VIOLATION);
             return null;
         }
         MultiValueMap<String, String> queryParams = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
-        String first = queryParams.getFirst("tempUid");
-        if (first == null || first.isEmpty()) {
+        String token = queryParams.getFirst("token");
+        if (token == null || token.isEmpty()) {
             session.close(CloseStatus.POLICY_VIOLATION);
             return null;
         }
-        return first;
+        return this.jsonWebTokenUtil.getPayLoad(token, TokenUser.class);
     }
 
     public static void sendFromMinecraftMessageToUser(FromMinecraftMessage message) {
         ONLINE_TALK_SESSION_POOL.forEach((k, v) -> {
             if (!v.isOpen()) return;
             ToWebMcMessage webMessage = new ToWebMcMessage();
-            webMessage.setPlayerName(message.getPlayerName());
+            webMessage.setName(message.getPlayerName());
             webMessage.setUuid(message.getUuid());
             webMessage.setTime(message.getTime());
             webMessage.setType(message.getType());
@@ -99,14 +106,15 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
             }
         });
     }
-    public static void sendMessageToUser(String message, WebSocketSession session) {
+    public static void sendMessageToUser(String message, WebSocketSession session, TokenUser user) {
         ONLINE_TALK_SESSION_POOL.forEach((k, v) -> {
             if (!v.isOpen() || v.equals(session)) return;
             ToWebUserMessage toWebUserMessage = new ToWebUserMessage();
             toWebUserMessage.setMessage(message);
             toWebUserMessage.setType(SocketMessageType.WEB_OTHER);
             toWebUserMessage.setTime(new Date());
-            toWebUserMessage.setPlayerName(SocketMessageType.WEB_OTHER.getType());
+            toWebUserMessage.setName(user.getUsername());
+            toWebUserMessage.setUid(user.getId());
             try {
                 v.sendMessage(new TextMessage(new Gson().toJson(toWebUserMessage)));
             } catch (IOException e) {
