@@ -44,7 +44,6 @@ public class MinecraftServerSocketHandler implements WebSocketHandler {
         if (serverName == null) return;
         log.error("transport error", exception);
         MINECRAFT_SERVER_SESSION_POOL.remove(serverName);
-        session.close(CloseStatus.NO_STATUS_CODE);
     }
 
     @Override
