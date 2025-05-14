@@ -5,6 +5,6 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ToMinecraftMessage extends BaseMessage{
+public class ToMinecraftMessage extends BaseMessage {
     private String name;
 }

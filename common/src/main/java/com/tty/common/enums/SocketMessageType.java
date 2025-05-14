@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum SocketMessageType {
-    WEB("web"),
-    WEB_OTHER("web_other"),
-    MINECRAFT("minecraft");
+    WEB("WEB"),
+    WEB_OTHER("WEB_OTHER"),
+    MINECRAFT("MINECRAFT");
 
     private final String type;
 
