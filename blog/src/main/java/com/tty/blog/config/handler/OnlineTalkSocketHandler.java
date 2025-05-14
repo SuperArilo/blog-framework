@@ -29,7 +29,7 @@ public class OnlineTalkSocketHandler implements WebSocketHandler {
 
     private final Gson gson = new Gson();
     public static final ConcurrentHashMap<Long, WebSocketSession> ONLINE_TALK_SESSION_POOL = new ConcurrentHashMap<>();
-    public static final List<ToWebMessage> HISTORY_MESSAGES = new ArrayList<>();
+    public static List<ToWebMessage> HISTORY_MESSAGES = new ArrayList<>();
     @Resource
     private JsonWebTokenUtil jsonWebTokenUtil;
 
